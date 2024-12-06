@@ -21,7 +21,6 @@ pipeline {
                 // Test
                 echo "The name ${ params.Nom } on the branch ${ params.BRANCH_NAME }"
             }
-
         }
     }
 }
