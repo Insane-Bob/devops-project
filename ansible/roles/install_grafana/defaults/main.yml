@@ -1,0 +1,12 @@
+---
+# defaults file for install_grafana
+# Version de Grafana à installer
+install_grafana_version: "5.4.0" # 9.6.3
+
+# Utilisateur et mot de passe administrateur
+install_grafana_admin_user: "admin"
+install_grafana_admin_password: "admin"
+
+# Dépôt pour Grafana (les versions peuvent être mises à jour ici)
+install_grafana_repo_url: "https://packages.grafana.com/oss/deb"
+install_grafana_repo_key_url: "https://packages.grafana.com/gpg.key"

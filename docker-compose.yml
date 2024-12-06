@@ -1,0 +1,50 @@
+services:
+  gestion:
+    build:
+      context: .
+      dockerfile: gestion.Dockerfile
+    container_name: gestion
+    networks:
+      mynetwork:
+        ipv4_address: 172.32.0.2
+    volumes:
+      - ./ansible:/home/ansible/ansible
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false # Skips the setup wizard
+    ports:
+      - "8080:8080"  # Jenkins Web UI port
+      - "50000:50000"
+  
+  monitoring:
+    build:
+      context: .
+      dockerfile: debian.Dockerfile
+    container_name: monitoring
+    networks:
+      mynetwork:
+        ipv4_address: 172.32.0.3
+    ports:
+      - "9090:9090"
+      - "9101:9100"
+      - "3000:3000"
+
+  web:
+    build:
+      context: .
+      dockerfile: debian.Dockerfile
+    container_name: web
+    networks:
+      mynetwork:
+        ipv4_address: 172.32.0.4
+    ports:
+      - "8081:80"
+      - "9102:9100"
+
+networks:
+  mynetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.32.0.0/16"

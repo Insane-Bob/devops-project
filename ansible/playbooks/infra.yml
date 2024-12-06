@@ -1,0 +1,18 @@
+- name: Playbook to configure prometheus and grafana
+  hosts: monitoring
+  become: true
+  roles:
+    - ../roles/install_prometheus
+    - ../roles/install_grafana
+
+- name: Installation node Exporter
+  hosts: all
+  become: true
+  roles:
+    - ../roles/node_exporter
+
+- name: Playbook to configure web server
+  hosts: web
+  become: true
+  roles:
+    - ../roles/web_server

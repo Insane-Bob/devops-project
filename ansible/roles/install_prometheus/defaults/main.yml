@@ -1,0 +1,8 @@
+---
+# defaults file for install_prometheus
+
+install_prometheus_vers: "2.45.0"  # Version de Prometheus à installer
+install_prometheus_port: 9090         # Port de Prometheus
+install_prometheus_data_dir: "/var/lib/prometheus"
+install_prometheus_load: "https://github.com/prometheus/prometheus/releases/download"
+install_prometheus_download_url: "{{ install_prometheus_load }}/v{{ install_prometheus_vers }}/prometheus-{{ install_prometheus_vers }}.linux-amd64.tar.gz"

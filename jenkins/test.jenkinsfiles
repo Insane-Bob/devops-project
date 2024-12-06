@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'Nom', description: 'Choisissez le nom de votre instance')
+        gitParameter(
+            branchFilter: '.*', 
+            defaultValue: 'master', 
+            name: 'BRANCH_NAME',
+            description: 'Choisissez la branche que vous souhaitez déployer',
+            type: 'PT_BRANCH',
+            useRepository: 'https://github.com/Insane-Bob/devops_template',
+            sortMode: 'DESCENDING_SMART',
+            quickFilterEnabled: true, 
+        )
+    }
+
+    stages {
+        stage('Test') {
+            steps {
+                // Test
+                echo "Test"
+            }
+
+        }
+    }
+}

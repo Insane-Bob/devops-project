@@ -1,0 +1,98 @@
+---
+# tasks file for install_prometheus
+
+- name: Install dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - wget
+      - tar
+      - adduser
+      - libfontconfig
+    state: present
+    update_cache: true
+
+- name: Create Prometheus user
+  become: true
+  ansible.builtin.user:
+    name: prometheus
+    system: true
+    shell: /bin/false
+
+- name: Download and install Prometheus
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v2.45.0/prometheus-2.45.0.linux-amd64.tar.gz"
+    dest: "/tmp/prometheus-{{ install_prometheus_vers }}.tar.gz"
+    mode: '0644'
+    validate_certs: false
+
+- name: Extract Prometheus
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/prometheus-{{ install_prometheus_vers }}.tar.gz"
+    dest: "/opt/"
+    remote_src: true
+
+- name: Move Prometheus binaries to /usr/local/bin
+  become: true
+  ansible.builtin.command: mv /opt/prometheus-{{ install_prometheus_vers }}.linux-amd64/prometheus /usr/local/bin/
+  changed_when: true
+
+- name: Create repository
+  become: true
+  ansible.builtin.file:
+    path: "/etc/prometheus/"
+    state: directory
+    mode: "0755"
+    owner: prometheus
+
+- name: Create Prometheus systemd service
+  become: true
+  ansible.builtin.copy:
+    content: |
+      #!/bin/sh
+      ### BEGIN INIT INFO
+      # Provides:          prometheus
+      # Required-Start:    $remote_fs $network $syslog
+      # Required-Stop:     $remote_fs $network $syslog
+      # Should-Start:      $time
+      # Should-Stop:       $time
+      # Default-Start:     2 3 4 5
+      # Default-Stop:      0 1 6
+      # Short-Description: Prometheus
+      # Description:       Prometheus monitoring system and time series database
+      ### END INIT INFO
+
+      case "$1" in
+        start)
+          /usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus/ &
+          ;;
+        stop)
+          pkill prometheus
+          ;;
+        restart)
+          pkill prometheus
+          /usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus/ &
+          ;;
+        *)
+          echo "Usage: /etc/init.d/prometheus {start|stop|restart}"
+          exit 1
+      esac
+      exit 0
+    dest: /etc/init.d/prometheus
+    mode: '0755'
+
+- name: Move Prometheus configuration file
+  become: true
+  ansible.builtin.template:
+    src: "prometheus.yml.j2"
+    dest: "/etc/prometheus/prometheus.yml"
+    mode: "0755"
+
+- name: Enable and start Prometheus service
+  become: true
+  ansible.builtin.service:
+    name: prometheus
+    enabled: true
+    state: started

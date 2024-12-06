@@ -1,0 +1,35 @@
+---
+# tasks file for web_server
+
+- name: Update apt cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+- name: UnInstall Apache2 web server
+  become: true
+  ansible.builtin.apt:
+    name: apache2
+    state: absent
+- name: Install Nginx web server
+  become: true
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: Ensure Nginx is running and enabled
+  become: true
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Copy custom index.html file (optionnel)
+  become: true
+  ansible.builtin.copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+  when: web_server_custom_index_html is defined
+  notify: Restart Nginx
