@@ -19,7 +19,7 @@ pipeline {
         stage('Test') {
             steps {
                 // Test
-                echo "Test"
+                echo "The name { params.Nom } on the branch { params.BRANCH_NAME }"
             }
 
         }
